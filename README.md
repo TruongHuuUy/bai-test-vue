@@ -1,4 +1,4 @@
-CẢM ƠN ÔNG NHỮNG NGÀY QUA ĐÃ TRAINING CHO TÔI. THÀNH THẬT RẤT CẢM ƠN ÔNG.
+# CẢM ƠN ÔNG NHỮNG NGÀY QUA ĐÃ TRAINING CHO TUI. THÀNH THẬT RẤT CẢM ƠN ÔNG.
 
 # bai-test-vue
 
