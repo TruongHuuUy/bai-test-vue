@@ -66,9 +66,9 @@ const resetItemInputTask = () => {
 
 const addNewTask = () => {
     if (!tasks.nameTask || !tasks.endDay || !tasks.fullName) {
-        !tasks.nameTask ? checkNameTask.value = true : checkNameTask.value = false
-        !tasks.endDay ? checkEndDay.value = true : checkEndDay.value = false
-        !tasks.fullName ? checkFullName.value = true : checkFullName.value = false
+        !tasks.nameTask ? checkNameTask.value = true : checkNameTask.value = false;
+        !tasks.endDay ? checkEndDay.value = true : checkEndDay.value = false;
+        !tasks.fullName ? checkFullName.value = true : checkFullName.value = false;
     } else {
         tasks.id = checkBigIdTask() + 1;
         props.listTasks.push(tasks);
