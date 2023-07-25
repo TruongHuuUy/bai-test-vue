@@ -1,0 +1,77 @@
+@import './base.css';
+
+#app {
+  position: relative;
+  color: black;
+}
+
+.title{
+  font-weight: bold;
+  border-bottom: 2px solid rgba(58, 57, 57, 0.2);
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+}
+
+.title-content{
+  font-weight: bold;
+}
+
+.date-content{
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.scrollbar {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  background-color: rgb(249, 249, 249);
+  text-align: center;
+  border-radius: 20px;
+  color: black;
+  width: 500px;
+  height: 100vh;
+  padding: 30px;
+}
+
+.header {
+  flex: none;
+}
+
+.item {
+  flex: 1 1 auto;
+  overflow-y: scroll;
+}
+
+.item::-webkit-scrollbar {
+  width: 0px;
+}
+
+.tab {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: 20px;
+}
+
+button{
+  width: 100px;
+  height: 40px;
+  border: none;
+  background-color: rgb(213, 222, 243);
+  border-radius: 10px;
+  color: blue;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+button:hover{
+  color: white;
+  font-size: 15px;
+  background-color: rgb(121, 161, 255);
+}
