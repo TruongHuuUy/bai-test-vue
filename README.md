@@ -1,3 +1,5 @@
+# CẢM ƠN ÔNG NHỮNG NGÀY QUA ĐÃ TRAINING CHO TUI. THÀNH THẬT RẤT CẢM ƠN ÔNG.
+
 # bai-test-vue
 
 This template should help get you started developing with Vue 3 in Vite.
