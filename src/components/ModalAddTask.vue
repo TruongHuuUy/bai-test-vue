@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { type Task } from "./types/TaskInterface";
+
 import { reactive, ref } from 'vue';
 
 const checkNameTask = ref(false);
@@ -20,14 +22,6 @@ const props = defineProps<Props>()
 // const emitEvent = () => {
 //     emit('reset', tasks);
 // };
-
-interface Task {
-    id: number,
-    nameTask: string,
-    endDay: string,
-    fullName: string,
-    status: boolean
-}
 
 interface ListTextError {
     nameTask: string[];

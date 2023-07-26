@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { type Task } from "./types/TaskInterface";
+
 const errorMessageEndDay: string = '* Task đã quá hạn, không thể click hoàn thành Task';
 
 export interface Props {
@@ -10,14 +12,6 @@ export interface Props {
 const props = withDefaults(defineProps<Props>(), {
     getDateLocal: '',
 })
-
-interface Task {
-    id: number,
-    nameTask: string,
-    endDay: string,
-    fullName: string,
-    status: boolean
-}
 
 const isChecked = (item: Task, index: number): boolean => {
     props.checkStatusTask(item)
@@ -31,13 +25,15 @@ const isChecked = (item: Task, index: number): boolean => {
         <div class="card-content">
             <div class="title-content">
                 <h3 class="title-content">Tên Task:
-                    <span :class="item.status === true ? 'line-through' : ''">
+                    <span :class="[{ 'line-through': item.status === true }]">
                         {{ item.nameTask }}
                     </span>
                 </h3>
                 <p><span>Người tạo: </span>{{ item.fullName }}</p>
             </div>
-            <input type="checkbox" @click="isChecked(item, index)" :checked="item.status === true">
+            <input :disabled="item.endDay < props.getDateLocal"
+                :class="[item.endDay < props.getDateLocal ? 'mouse-no-drop' : 'mouse-pointer']" type="checkbox"
+                @click="isChecked(item, index)" :checked="item.status === true">
         </div>
 
         <div class="card-end-day">
@@ -88,7 +84,6 @@ input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     outline: none;
-    cursor: pointer;
 }
 
 input[type="checkbox"]:checked {
@@ -103,5 +98,13 @@ input[type="checkbox"]:checked {
     margin-top: 10px;
     font-size: 12px;
     color: red;
+}
+
+.mouse-pointer {
+    cursor: pointer;
+}
+
+.mouse-no-drop {
+    cursor: no-drop;
 }
 </style>

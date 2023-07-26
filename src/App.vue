@@ -3,70 +3,56 @@ import TaskList from './components/TaskList.vue';
 import TabButton from './components/TabButton.vue';
 import ModalAddTask from './components/ModalAddTask.vue';
 import { onBeforeMount, onMounted, ref } from 'vue';
+import { type Task } from "./components/types/TaskInterface";
+import { type Tab } from "./components/types/TabInterface";
 
 const listTasks = ref<Task[]>([]);
 const listTasksFiltered = ref<Task[]>();
 const showModal = ref<boolean>(false);
 const checkTaskCreateSuccess = ref<boolean>(false);
 const messsSuccessCreateTask: string = 'Bạn đã tạo TASK thành công';
-
 const getDateLocal: string = new Date().toLocaleDateString("en-CA");
-
-interface Tab {
-  id: number,
-  idName: string,
-  name: string,
-  count: number,
-  status: string,
-}
-
-interface Task {
-  id: number,
-  nameTask: string,
-  endDay: string,
-  fullName: string,
-  status: boolean
-}
 
 const listTabs = ref<Tab[]>([
   {
     id: 0,
-    idName: 'tabAll',
+    key: 'tabAll',
     name: 'Tất cả',
     count: 0,
-    status: '',
+    status: false,
   },
   {
     id: 1,
-    idName: 'tabDoNot',
+    key: 'tabDoNot',
     name: 'Chưa làm',
     count: 0,
-    status: '',
+    status: false,
   },
   {
     id: 2,
-    idName: 'tabDone',
+    key: 'tabDone',
     name: 'Đã làm',
     count: 0,
-    status: '',
+    status: false,
   },
   {
     id: 3,
-    idName: 'tabTimeLimit',
+    key: 'tabTimeLimit',
     name: 'Quá hạn',
     count: 0,
-    status: '',
+    status: false,
   }
 ])
 
 onBeforeMount(() => {
-  listTasks.value = getDataFromLocalStorage();
-  listTasksFiltered.value = listTasks.value;
+  initDefaultData();
 })
 
-onMounted(() => {
+const initDefaultData = () => {
+  listTasks.value = getDataFromLocalStorage();
+  listTasksFiltered.value = listTasks.value;
   countToTalAllTabs();
-})
+}
 
 function getDataFromLocalStorage(): Task[] {
   const result = localStorage.getItem('Task') || '';
@@ -94,10 +80,6 @@ const countToTalAllTabs = () => {
 const countTotalDoNotAndDoneTab = () => {
   listTabs.value[1].count = filterDoNotTask(listTasks.value).length;
   listTabs.value[2].count = filterDoneTask(listTasks.value).length;
-}
-
-const countNumberTask = (list: Task[]): number => {
-  return list.length;
 }
 
 const filterTask = (key: string) => {
@@ -133,7 +115,7 @@ const filterTimeLimitTask = (listTasks: Task[]): Task[] => {
 }
 
 const checkStatusTask = (key: Task) => {
-  if (getDateLocal < key.endDay && key.status === false) {
+  if (key.status === false) {
     key.status = true;
   } else {
     key.status = false;
@@ -143,9 +125,7 @@ const checkStatusTask = (key: Task) => {
 }
 
 const showMessageSusscessCreateTask = () => {
-  listTasks.value = getDataFromLocalStorage();
-  listTasksFiltered.value = listTasks.value;
-  countToTalAllTabs();
+  initDefaultData();
   checkTaskCreateSuccess.value = true;
   setTimeout(() => {
     checkTaskCreateSuccess.value = false;
@@ -155,7 +135,7 @@ const showMessageSusscessCreateTask = () => {
 </script>
 
 <template>
-  <div class="message-create" :class="[checkTaskCreateSuccess ? 'message-create-success' : '']">
+  <div class="message-create" :class="[{ 'message-create-success': checkTaskCreateSuccess }]">
     <h1>{{ messsSuccessCreateTask }}</h1>
   </div>
   <main class="scrollbar">
@@ -178,7 +158,7 @@ const showMessageSusscessCreateTask = () => {
       <TaskList :getDateLocal="getDateLocal" :listTasks="listTasksFiltered" :checkStatusTask="checkStatusTask"></TaskList>
     </section>
   </main>
-  <section class="modal" :class="[showModal ? 'show-modal' : '']">
+  <section class="modal" :class="[{ 'show-modal': showModal }]">
     <ModalAddTask :listTasks="listTasks" :lostModal="lostModal"
       :showMessageSusscessCreateTask="showMessageSusscessCreateTask">
     </ModalAddTask>
@@ -215,4 +195,4 @@ const showMessageSusscessCreateTask = () => {
 .show-modal {
   display: block;
 }
-</style>
+</style>./components/types/TaskInterface

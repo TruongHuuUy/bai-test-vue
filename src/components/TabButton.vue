@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { type Tab } from "./types/TabInterface";
 
 export interface Props {
     listTabs: Tab[];
@@ -10,23 +11,15 @@ const props = defineProps<Props>()
 
 const check = ref(0);
 
-interface Tab {
-    id: number,
-    idName: string,
-    name: string,
-    count: number,
-    status: string,
-}
-
 const onClickTab = (item: Tab, index: number) => {
     check.value = item.id;
-    props.filterTask(item.idName);
+    props.filterTask(item.key);
 }
 </script>
 
 <template>
     <button class="tab-button" @click="onClickTab(item, index)" v-for="(item, index) in listTabs"
-        :class="[item.id === check ? 'active' : '']">{{ item.name }}
+        :class="[{ 'active': item.id === check }]">{{ item.name }}
         <span>{{ item.count }}</span>
     </button>
 </template>
