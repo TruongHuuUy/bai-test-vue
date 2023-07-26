@@ -2,56 +2,39 @@
 import TaskList from './components/TaskList.vue';
 import TabButton from './components/TabButton.vue';
 import ModalAddTask from './components/ModalAddTask.vue';
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { type Task } from "./components/types/TaskInterface";
 import { type Tab } from "./components/types/TabInterface";
 
+const listTabs = ref<Tab[]>([]);
 const listTasks = ref<Task[]>([]);
 const listTasksFiltered = ref<Task[]>();
 const showModal = ref<boolean>(false);
 const checkTaskCreateSuccess = ref<boolean>(false);
+
 const messsSuccessCreateTask: string = 'Bạn đã tạo TASK thành công';
 const getDateLocal: string = new Date().toLocaleDateString("en-CA");
-
-const listTabs = ref<Tab[]>([
-  {
-    id: 0,
-    key: 'tabAll',
-    name: 'Tất cả',
-    count: 0,
-    status: false,
-  },
-  {
-    id: 1,
-    key: 'tabDoNot',
-    name: 'Chưa làm',
-    count: 0,
-    status: false,
-  },
-  {
-    id: 2,
-    key: 'tabDone',
-    name: 'Đã làm',
-    count: 0,
-    status: false,
-  },
-  {
-    id: 3,
-    key: 'tabTimeLimit',
-    name: 'Quá hạn',
-    count: 0,
-    status: false,
-  }
-])
 
 onBeforeMount(() => {
   initDefaultData();
 })
 
+const eventChangeListTabs = (getListTabs: Tab[]) => {
+  listTabs.value = getListTabs
+  countToTalAllTabs(getListTabs);
+}
+
+const eventChangeKeyTab = (key: string) => {
+  filterTask(key);
+}
+
+const eventChangeClickTask = (item: Task) => {
+  checkStatusTask(item);
+}
+
 const initDefaultData = () => {
   listTasks.value = getDataFromLocalStorage();
   listTasksFiltered.value = listTasks.value;
-  countToTalAllTabs();
 }
 
 function getDataFromLocalStorage(): Task[] {
@@ -70,16 +53,16 @@ const lostModal = () => {
   showModal.value = false;
 }
 
-const countToTalAllTabs = () => {
-  listTabs.value[0].count = listTasks.value.length;
-  listTabs.value[1].count = filterDoNotTask(listTasks.value).length;
-  listTabs.value[2].count = filterDoneTask(listTasks.value).length;
-  listTabs.value[3].count = filterTimeLimitTask(listTasks.value).length;
+const countToTalAllTabs = (listTabs: Tab[]) => {
+  listTabs[0].count = listTasks.value.length;
+  listTabs[1].count = filterDoNotTask(listTasks.value).length;
+  listTabs[2].count = filterDoneTask(listTasks.value).length;
+  listTabs[3].count = filterTimeLimitTask(listTasks.value).length;
 }
 
-const countTotalDoNotAndDoneTab = () => {
-  listTabs.value[1].count = filterDoNotTask(listTasks.value).length;
-  listTabs.value[2].count = filterDoneTask(listTasks.value).length;
+const countTotalDoNotAndDoneTab = (listTabs: Tab[]) => {
+  listTabs[1].count = filterDoNotTask(listTasks.value).length;
+  listTabs[2].count = filterDoneTask(listTasks.value).length;
 }
 
 const filterTask = (key: string) => {
@@ -114,24 +97,24 @@ const filterTimeLimitTask = (listTasks: Task[]): Task[] => {
   })
 }
 
-const checkStatusTask = (key: Task) => {
-  if (key.status === false) {
-    key.status = true;
+const checkStatusTask = (item: Task) => {
+  if (item.status === false) {
+    item.status = true;
   } else {
-    key.status = false;
+    item.status = false;
   }
   localStorage.setItem("Task", JSON.stringify(listTasks.value))
-  countTotalDoNotAndDoneTab();
+  countTotalDoNotAndDoneTab(listTabs.value);
 }
 
 const showMessageSusscessCreateTask = () => {
   initDefaultData();
+  countToTalAllTabs(listTabs.value);
   checkTaskCreateSuccess.value = true;
   setTimeout(() => {
     checkTaskCreateSuccess.value = false;
   }, 1000);
 }
-
 </script>
 
 <template>
@@ -150,12 +133,13 @@ const showMessageSusscessCreateTask = () => {
           <button id="openModal" @click="openModal()">+ Thêm Task</button>
         </div>
         <div class="tab">
-          <TabButton :listTabs="listTabs" :filterTask="filterTask"></TabButton>
+          <TabButton @changeKeyTab="eventChangeKeyTab" @changeListTabs="eventChangeListTabs"></TabButton>
         </div>
       </div>
     </section>
     <section class="item">
-      <TaskList :getDateLocal="getDateLocal" :listTasks="listTasksFiltered" :checkStatusTask="checkStatusTask"></TaskList>
+      <TaskList @changeClickTask="eventChangeClickTask" :getDateLocal="getDateLocal" :listTasks="listTasksFiltered">
+      </TaskList>
     </section>
   </main>
   <section class="modal" :class="[{ 'show-modal': showModal }]">
@@ -195,4 +179,4 @@ const showMessageSusscessCreateTask = () => {
 .show-modal {
   display: block;
 }
-</style>./components/types/TaskInterface
+</style>

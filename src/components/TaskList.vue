@@ -6,7 +6,7 @@ const errorMessageEndDay: string = '* Task đã quá hạn, không thể click h
 export interface Props {
     getDateLocal: string;
     listTasks?: Task[];
-    checkStatusTask: (task: Task) => void;
+    // checkStatusTask: (task: Task) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -14,9 +14,17 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const isChecked = (item: Task, index: number): boolean => {
-    props.checkStatusTask(item)
+    emitEvent(item)
     return item.status
 }
+
+const emit = defineEmits<{
+    changeClickTask: [key: Task]
+}>()
+
+const emitEvent = (item: Task) => {
+    emit('changeClickTask', item);
+};
 
 </script>
 
