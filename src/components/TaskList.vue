@@ -4,13 +4,13 @@ import { type Task } from "./types/TaskInterface";
 const errorMessageEndDay: string = '* Task đã quá hạn, không thể click hoàn thành Task';
 
 export interface Props {
-    getDateLocal: string;
+    getDateTimeLocal: string;
     listTasks?: Task[];
     // checkStatusTask: (task: Task) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    getDateLocal: '',
+    getDateTimeLocal: '',
 })
 
 const isChecked = (item: Task, index: number): boolean => {
@@ -25,7 +25,6 @@ const emit = defineEmits<{
 const emitEvent = (item: Task) => {
     emit('changeClickTask', item);
 };
-
 </script>
 
 <template>
@@ -39,14 +38,15 @@ const emitEvent = (item: Task) => {
                 </h3>
                 <p><span>Người tạo: </span>{{ item.fullName }}</p>
             </div>
-            <input :disabled="item.endDay < props.getDateLocal"
-                :class="[item.endDay < props.getDateLocal ? 'mouse-no-drop' : 'mouse-pointer']" type="checkbox"
+            <input :disabled="item.endDay < props.getDateTimeLocal"
+                :class="[item.endDay < props.getDateTimeLocal ? 'mouse-no-drop' : 'mouse-pointer']" type="checkbox"
                 @click="isChecked(item, index)" :checked="item.status === true">
         </div>
 
         <div class="card-end-day">
             <p>Ngày kết thúc: <span>{{ item.endDay }}</span></p>
-            <p v-if="item.endDay < props.getDateLocal" class="error-message-end-day">{{ errorMessageEndDay }}</p>
+            <p v-if="item.endDay < props.getDateTimeLocal && item.status === false" class="error-message-end-day">{{
+                errorMessageEndDay }}</p>
         </div>
     </div>
 </template>
@@ -92,6 +92,7 @@ input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     outline: none;
+    transition: 0.5s;
 }
 
 input[type="checkbox"]:checked {

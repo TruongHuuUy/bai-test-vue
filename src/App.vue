@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import TaskList from './components/TaskList.vue';
-import TabButton from './components/TabButton.vue';
+import TaskList from "./components/TaskList.vue";
+import Tabs from './components/Tabs.vue';
 import ModalAddTask from './components/ModalAddTask.vue';
-import { onBeforeMount, ref } from 'vue';
+
+import { onBeforeMount, reactive, ref } from 'vue';
+
 import { type Task } from "./components/types/TaskInterface";
 import { type Tab } from "./components/types/TabInterface";
 
@@ -10,10 +12,21 @@ const listTabs = ref<Tab[]>([]);
 const listTasks = ref<Task[]>([]);
 const listTasksFiltered = ref<Task[]>();
 const showModal = ref<boolean>(false);
+const showModalCalendar = ref<boolean>(false);
+
 const checkTaskCreateSuccess = ref<boolean>(false);
 
 const messsSuccessCreateTask: string = 'Bạn đã tạo TASK thành công';
 const getDateLocal: string = new Date().toLocaleDateString("en-CA");
+const getDateTimeLocal: Date = new Date();
+const formaHourstUTC = getDateTimeLocal.getUTCHours() + 7;
+const dateFormated =
+  getDateTimeLocal.getUTCFullYear() + "-" +
+  ("0" + (getDateTimeLocal.getUTCMonth() + 1)).slice(-2) + "-" +
+  ("0" + getDateTimeLocal.getUTCDate()).slice(-2) + " " +
+  ("0" + formaHourstUTC).slice(-2) + ":" +
+  ("0" + getDateTimeLocal.getUTCMinutes()).slice(-2) + ":" +
+  ("0" + getDateTimeLocal.getUTCSeconds()).slice(-2);
 
 onBeforeMount(() => {
   initDefaultData();
@@ -49,8 +62,16 @@ const openModal = () => {
   showModal.value = true;
 }
 
-const lostModal = () => {
+const lostModalAddTask = () => {
   showModal.value = false;
+}
+
+const openCalendar = () => {
+  showModalCalendar.value = true;
+}
+
+const lostCalendar = () => {
+  showModalCalendar.value = false;
 }
 
 const countToTalAllTabs = (listTabs: Tab[]) => {
@@ -93,7 +114,7 @@ const filterDoneTask = (listTasks: Task[]): Task[] => {
 
 const filterTimeLimitTask = (listTasks: Task[]): Task[] => {
   return listTasks = listTasks.filter(item => {
-    return item.endDay < getDateLocal
+    return item.endDay < dateFormated
   })
 }
 
@@ -118,6 +139,8 @@ const showMessageSusscessCreateTask = () => {
 </script>
 
 <template>
+  <button @click="openCalendar()">Open Calendar</button>
+
   <div class="message-create" :class="[{ 'message-create-success': checkTaskCreateSuccess }]">
     <h1>{{ messsSuccessCreateTask }}</h1>
   </div>
@@ -130,26 +153,45 @@ const showMessageSusscessCreateTask = () => {
             <h2 class="title-content">Task Hôm Nay</h2>
             <p>Ngày: {{ getDateLocal }}</p>
           </div>
-          <button id="openModal" @click="openModal()">+ Thêm Task</button>
+          <button @click="openModal()">+ Thêm Task</button>
         </div>
         <div class="tab">
-          <TabButton @changeKeyTab="eventChangeKeyTab" @changeListTabs="eventChangeListTabs"></TabButton>
+          <Tabs @changeKeyTab="eventChangeKeyTab" @changeListTabs="eventChangeListTabs"></Tabs>
         </div>
       </div>
     </section>
     <section class="item">
-      <TaskList @changeClickTask="eventChangeClickTask" :getDateLocal="getDateLocal" :listTasks="listTasksFiltered">
+      <TaskList @changeClickTask="eventChangeClickTask" :getDateTimeLocal="dateFormated" :listTasks="listTasksFiltered">
       </TaskList>
     </section>
   </main>
   <section class="modal" :class="[{ 'show-modal': showModal }]">
-    <ModalAddTask :listTasks="listTasks" :lostModal="lostModal"
-      :showMessageSusscessCreateTask="showMessageSusscessCreateTask">
+    <ModalAddTask :listTasks="listTasks" :lostModalAddTask="lostModalAddTask"
+      :showMessageSusscessCreateTask="showMessageSusscessCreateTask" :dateFormated="dateFormated"
+      :getDateLocal="getDateLocal">
     </ModalAddTask>
+  </section>
+  <section class="modal-calendar" :class="[{ 'show-modal-calendar': showModalCalendar }]">
+    <!-- <Calendar></Calendar> -->
   </section>
 </template>
 
 <style scoped>
+.modal-calendar {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  top: 0;
+  z-index: 10;
+}
+
+.show-modal-calendar {
+  display: block;
+}
+
 .message-create {
   display: none;
   transition: 1.5s;

@@ -65,14 +65,16 @@ const onClickTab = (item: Tab, index: number) => {
     </button>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+$color: red;
+
 .tab-button {
     color: #000;
     background-color: rgb(249, 249, 249);
 }
 
 .tab-button:hover {
-    font-size: 15px;
+    font-size: 16px;
     color: blue;
     background-color: rgb(213, 222, 243);
 }
