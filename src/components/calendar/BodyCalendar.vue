@@ -2,7 +2,7 @@
 import { type Day } from '@/components/types/DayInterface';
 import type { Task } from '../types/TaskInterface';
 
-const styleBtnTasks = 'w-6 h-6 rounded-full cursor-pointer ease-in text-sm duration-300 hover:rounded-xl hover:bg-emerald-300 hover:w-8 hover:h-8'
+const styleBtnTasks = 'w-7 h-7 rounded-full cursor-pointer ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400'
 
 export interface Props {
     getDateLocal: string;
@@ -10,7 +10,7 @@ export interface Props {
 }
 
 const emit = defineEmits<{
-    changeClickOpenTask: [key: boolean]
+    changeClickOpenTask: [key: boolean, fullDate: string | number]
     changeGetDataTaskInDate: [key: Task[]]
 }>()
 
@@ -20,18 +20,18 @@ const days: string[] = [
     'CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'
 ]
 
-const onclickTaskDoNot = (task: Task[], index: number) => {
-    emit('changeClickOpenTask', true);
+const onclickTaskDoNot = (task: Task[], fullDate: string | number) => {
+    emit('changeClickOpenTask', true, fullDate);
     emit('changeGetDataTaskInDate', task);
 }
 
-const onclickTaskDone = (task: Task[], index: number) => {
-    emit('changeClickOpenTask', true);
+const onclickTaskDone = (task: Task[], fullDate: string | number) => {
+    emit('changeClickOpenTask', true, fullDate);
     emit('changeGetDataTaskInDate', task);
 }
 
-const onclickTaskLimit = (task: Task[], index: number) => {
-    emit('changeClickOpenTask', true);
+const onclickTaskLimit = (task: Task[], fullDate: string | number) => {
+    emit('changeClickOpenTask', true, fullDate);
     emit('changeGetDataTaskInDate', task);
 }
 </script>
@@ -46,16 +46,16 @@ const onclickTaskLimit = (task: Task[], index: number) => {
             {{ item.date }}
             <div
                 :class="{ 'active absolute w-full h-full top-0  pt-5 border-[2px] border-orange-400 z-0': item.fullDate === props.getDateLocal }">
-                <div class="flex justify-around items-center h-[70px]">
-                    <button @click="onclickTaskDoNot(item.task, index)" v-if="item.checkTaskDoNot === true"
-                        :class="[{ 'bg-yellow-300': item.checkTaskDoNot === true }, styleBtnTasks]">
+                <div class="flex justify-around items-center h-[70px] text-white font-bold">
+                    <button @click="onclickTaskDoNot(item.task, item.fullDate)" v-if="item.checkTaskDoNot === true"
+                        :class="[{ 'bg-yellow-500': item.checkTaskDoNot === true }, styleBtnTasks]">
                         <span>{{ item.countTaskDoNot }}</span>
                     </button>
-                    <button @click="onclickTaskLimit(item.task, index)" v-if="item.checkTaskLimit === true"
+                    <button @click="onclickTaskLimit(item.task, item.fullDate)" v-if="item.checkTaskLimit === true"
                         :class="[{ 'bg-red-400': item.checkTaskLimit === true }, styleBtnTasks]">
                         <span>{{ item.countTaskLimit }}</span>
                     </button>
-                    <button @click="onclickTaskDone(item.task, index)" v-if="item.checkTaskDone === true"
+                    <button @click="onclickTaskDone(item.task, item.fullDate)" v-if="item.checkTaskDone === true"
                         :class="[{ 'bg-sky-400': item.checkTaskDone === true }, styleBtnTasks]">
                         <span>{{ item.countTaskDone }}</span>
                     </button>

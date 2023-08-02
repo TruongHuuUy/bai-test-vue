@@ -18,6 +18,7 @@ const listTaskGetDataInDate = ref<Task[]>();
 
 const dateOfMonth = ref<Day[]>([])
 const currentMonthed = ref<string | Date>('');
+const getFullDate = ref<string | number>('');
 
 const showModalAddTask = ref<boolean>(false);
 const showModalTask = ref<boolean>(false);
@@ -220,9 +221,10 @@ const filterTimeLimitTask = (listTasks: Task[]): Task[] => {
     })
 }
 
-const eventChangeOpenTask = (data: boolean) => {
+const eventChangeOpenTask = (data: boolean, fullDate: string | number) => {
     if (data) {
         openModalTask();
+        getFullDate.value = fullDate;
     }
 }
 
@@ -267,7 +269,7 @@ const eventChangeSelectMonthYear = (month: number, year: number) => {
     <section class="modal absolute hidden w-full h-full backdrop-blur-sm top-0 z-10"
         :class="[{ 'show-modal-task': showModalTask }]">
         <ModalTasks :lostModalTask="lostModalTask" :getDateLocal="getDateLocal" :listTasks="listTasks"
-            :listTaskGetDataInDate="listTaskGetDataInDate">
+            :getFullDate="getFullDate" :listTaskGetDataInDate="listTaskGetDataInDate">
         </ModalTasks>
     </section>
 </template>
