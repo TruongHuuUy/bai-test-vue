@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Task } from "@/components/types/TaskInterface";
-
+import { dateFormated } from '@/components/functions/formatDateTimeFunction';
 import { reactive, ref } from 'vue';
 
 const checkNameTask = ref(false);
@@ -37,15 +37,6 @@ const listTextError: ListTextError = {
     endDay: ['* Mời bạn chọn Ngày Kết Thúc!', ''],
     fullName: ['* Mời bạn nhập Tên người tạo TASK!', ''],
 };
-
-const dateFormated = (currentDate: Date): string => {
-    return currentDate.getUTCFullYear() + "-" +
-        ("0" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" +
-        ("0" + currentDate.getUTCDate()).slice(-2) + " " +
-        ("0" + (currentDate.getUTCHours() + 7)).slice(-2) + ":" +
-        ("0" + currentDate.getUTCMinutes()).slice(-2) + ":" +
-        ("0" + currentDate.getUTCSeconds()).slice(-2);
-}
 
 const checkBigIdTask = (): number => {
     let count: number = 0;
@@ -182,4 +173,4 @@ const addNewTask = () => {
 .form-field:invalid {
     box-shadow: none;
 }
-</style>
+</style>@/components/function/formatDateTimeFunction

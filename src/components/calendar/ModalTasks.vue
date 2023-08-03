@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 import type { Task } from '../types/TaskInterface';
-import TaskList from "@/components/tasks/TaskList.vue";
+import { dateFormated } from '@/components/functions/formatDateTimeFunction'
+import TaskList from '@/components/tasks/TaskList.vue';
 
 export interface Props {
     getFullDate: string | number;
@@ -12,15 +13,6 @@ export interface Props {
 }
 
 const props = defineProps<Props>()
-
-const dateFormated = (currentDate: Date): string => {
-    return currentDate.getUTCFullYear() + "-" +
-        ("0" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" +
-        ("0" + currentDate.getUTCDate()).slice(-2) + " " +
-        ("0" + (currentDate.getUTCHours() + 7)).slice(-2) + ":" +
-        ("0" + currentDate.getUTCMinutes()).slice(-2) + ":" +
-        ("0" + currentDate.getUTCSeconds()).slice(-2);
-}
 
 const checkStatusTask = (item: Task) => {
     const currentDate = new Date();
@@ -69,4 +61,4 @@ const eventChangeClickTask = (item: Task) => {
 .item-scroll::-webkit-scrollbar {
     width: 0px;
 }
-</style>
+</style>@/components/function/formatDateTimeFunction

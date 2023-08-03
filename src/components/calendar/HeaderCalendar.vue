@@ -6,19 +6,21 @@ const currentDate = new Date();
 const years: number[] = []
 const currentMonth = ref<number>(currentDate.getMonth() + 1);
 const currentYear = ref<number>(currentDate.getFullYear());
+const getToDay = ("0" + currentDate.getUTCDate()).slice(-2) + "-" + ("0" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" + currentDate.getUTCFullYear()
 
 const styleSelect = 'text-center min-w-[80px] h-8 rounded-xl outline-none border-solid border-[1px] border-sky-300 duration-700';
 const styleButton = 'text-sky-500 hover:text-red-600 duration-500'
 
 export interface Props {
     openModalAddTask: () => void;
+    // initDefaultData: () => void;
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
     changeSelectMonthYear: [month: number, year: number],
-    changeClickArrowMonth: [check: boolean]
+    changeClickArrowMonth: [check: boolean],
 }>()
 
 watch([currentMonth, currentYear], ([month, year], [prevMonth, prevYear]) => {
@@ -41,6 +43,12 @@ const totalYears = (currentYear: number): number[] => {
     return years;
 };
 
+// const loadDataDefault = () => {
+//     console.log(currentMonth.value);
+
+//     props.initDefaultData()
+// }
+
 const clickNextMonth = () => {
     currentMonth.value += 1;
     if (currentMonth.value > 12) {
@@ -62,10 +70,10 @@ const clickPrevMonth = () => {
 </script>
 
 <template>
-    <div class="relative font-bold border-b-2 border-slate-400 pb-4 mb-8">
+    <div class="relative font-bold border-b-2 border-slate-400 pb-3 mb-6">
         <h2 class="text-3xl">CALENDAR</h2>
-        <!-- <h3 class="text-xl text-orange-500 m-2">{{ currentMonth }} - {{ currentYear }}</h3> -->
     </div>
+    <!-- <button class="text-xl font-bold text-red-500" @click="loadDataDefault()">{{ getToDay }}</button> -->
     <div class="flex justify-between mb-3">
         <div class="flex items-center">
             <button :class="styleButton" class="mr-2" @click="clickPrevMonth()">
