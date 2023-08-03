@@ -1,224 +1,280 @@
 <script setup lang="ts">
-import TaskList from "./components/TaskList.vue";
-import Tabs from './components/Tabs.vue';
-import ModalAddTask from './components/ModalAddTask.vue';
-
-import { onBeforeMount, reactive, ref } from 'vue';
+import HeaderCalendar from './components/calendar/HeaderCalendar.vue'
+import BodyCalendar from './components/calendar/BodyCalendar.vue'
+import FooterCalendar from './components/calendar/FooterCalendar.vue'
+import ModalAddTask from './components/tasks/ModalAddTask.vue';
+import ModalTasks from './components/calendar/ModalTasks.vue'
 
 import { type Task } from "./components/types/TaskInterface";
-import { type Tab } from "./components/types/TabInterface";
+import { type Day } from "./components/types/DayInterface";
+import { onBeforeMount, ref } from 'vue';
 
-const listTabs = ref<Tab[]>([]);
+const currentDate = new Date();
+const getDateLocal: string = new Date().toLocaleDateString("en-CA");
+
 const listTasks = ref<Task[]>([]);
-const listTasksFiltered = ref<Task[]>();
-const showModal = ref<boolean>(false);
-const showModalCalendar = ref<boolean>(false);
+const listTaskGetDataInDate = ref<Task[]>();
 
+const dateOfMonth = ref<Day[]>([])
+const currentMonthed = ref<string | Date>('');
+const getFullDate = ref<string | number>('');
+
+const showModalAddTask = ref<boolean>(false);
+const showModalTask = ref<boolean>(false);
 const checkTaskCreateSuccess = ref<boolean>(false);
 
 const messsSuccessCreateTask: string = 'Bạn đã tạo TASK thành công';
-const getDateLocal: string = new Date().toLocaleDateString("en-CA");
-const getDateTimeLocal: Date = new Date();
-const formaHourstUTC = getDateTimeLocal.getUTCHours() + 7;
-const dateFormated =
-  getDateTimeLocal.getUTCFullYear() + "-" +
-  ("0" + (getDateTimeLocal.getUTCMonth() + 1)).slice(-2) + "-" +
-  ("0" + getDateTimeLocal.getUTCDate()).slice(-2) + " " +
-  ("0" + formaHourstUTC).slice(-2) + ":" +
-  ("0" + getDateTimeLocal.getUTCMinutes()).slice(-2) + ":" +
-  ("0" + getDateTimeLocal.getUTCSeconds()).slice(-2);
 
 onBeforeMount(() => {
-  initDefaultData();
+    initDefaultData();
 })
 
-const eventChangeListTabs = (getListTabs: Tab[]) => {
-  listTabs.value = getListTabs
-  countToTalAllTabs(getListTabs);
-}
-
-const eventChangeKeyTab = (key: string) => {
-  filterTask(key);
-}
-
-const eventChangeClickTask = (item: Task) => {
-  checkStatusTask(item);
-}
-
 const initDefaultData = () => {
-  listTasks.value = getDataFromLocalStorage();
-  listTasksFiltered.value = listTasks.value;
+    currentMonthed.value = updateMonthed(currentDate);
+    dateOfMonth.value = updateDays(currentDate);
+    listTasks.value = getDataFromLocalStorage();
 }
 
 function getDataFromLocalStorage(): Task[] {
-  const result = localStorage.getItem('Task') || '';
-  if (result !== '') {
-    return listTasks.value ? JSON.parse(result) : [];
-  }
-  return [];
+    const result = localStorage.getItem('Task') || '';
+    if (result !== '') {
+        return listTasks.value ? JSON.parse(result) : [];
+    }
+    return [];
 }
 
-const openModal = () => {
-  showModal.value = true;
+const openModalAddTask = () => {
+    showModalAddTask.value = true;
 }
 
 const lostModalAddTask = () => {
-  showModal.value = false;
+    showModalAddTask.value = false;
 }
 
-const openCalendar = () => {
-  showModalCalendar.value = true;
+const openModalTask = () => {
+    showModalTask.value = true;
 }
 
-const lostCalendar = () => {
-  showModalCalendar.value = false;
+const lostModalTask = () => {
+    showModalTask.value = false;
+    updateDays(currentDate);
 }
 
-const countToTalAllTabs = (listTabs: Tab[]) => {
-  listTabs[0].count = listTasks.value.length;
-  listTabs[1].count = filterDoNotTask(listTasks.value).length;
-  listTabs[2].count = filterDoneTask(listTasks.value).length;
-  listTabs[3].count = filterTimeLimitTask(listTasks.value).length;
+const updateMonthed = (currentDate: Date) => {
+    const currentMonthed = (currentDate.toLocaleDateString('en-GB'));
+    return currentMonthed;
 }
 
-const countTotalDoNotAndDoneTab = (listTabs: Tab[]) => {
-  listTabs[1].count = filterDoNotTask(listTasks.value).length;
-  listTabs[2].count = filterDoneTask(listTasks.value).length;
+const updateDays = (currentDate: Date) => {
+    const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getMonth();
+    const fullYear = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getFullYear();
+
+    dateOfMonth.value = []
+    let monthed = '';
+
+    getLastDateOfLastMonth(lastMonth, fullYear, monthed);
+
+    getDateInMonth(lastMonth + 1, fullYear, monthed);
+
+    getFirstDateOfNextMonth(lastMonth + 2, fullYear, monthed);
+
+    addTaskInDate();
+
+    return dateOfMonth.value
 }
 
-const filterTask = (key: string) => {
-  let result: Task[] = [];
-  if (key === 'tabAll') {
-    result = listTasks.value.filter(item => item != null)
-  } else if (key === 'tabDoNot') {
-    result = filterDoNotTask(listTasks.value);
-  } else if (key === 'tabDone') {
-    result = filterDoneTask(listTasks.value);
-  } else if (key === 'tabTimeLimit') {
-    result = filterTimeLimitTask(listTasks.value);
-  }
-  listTasksFiltered.value = result;
+const getLastDateOfLastMonth = (lastMonth: number, fullYear: number, monthed: string) => {
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+    const lastDateOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+
+    for (let i = firstDayOfMonth; i > 0; i--) {
+        addDateToDateOfMonth(lastMonth, monthed, fullYear, lastDateOfLastMonth - i + 1, false);
+    }
 }
 
-const filterDoNotTask = (listTasks: Task[]): Task[] => {
-  return listTasks = listTasks.filter(item => {
-    return item.status === false
-  })
+const getDateInMonth = (lastMonth: number, fullYear: number, monthed: string) => {
+    const datesInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+
+    for (let i = 1; i <= datesInMonth; i++) {
+        addDateToDateOfMonth(lastMonth, monthed, fullYear, i, true);
+    }
 }
 
-const filterDoneTask = (listTasks: Task[]): Task[] => {
-  return listTasks = listTasks.filter(item => {
-    return item.status === true
-  })
+const getFirstDateOfNextMonth = (lastMonth: number, fullYear: number, monthed: string) => {
+    const countLastDate = 42 - dateOfMonth.value.length;
+
+    for (let i = 1; i <= countLastDate; i++) {
+        addDateToDateOfMonth(lastMonth, monthed, fullYear, i, false);
+    }
 }
 
-const filterTimeLimitTask = (listTasks: Task[]): Task[] => {
-  return listTasks = listTasks.filter(item => {
-    return item.endDay < dateFormated
-  })
+const addDateToDateOfMonth = (lastMonth: number, monthed: string, fullYear: number, date: number, statusActive: boolean) => {
+    let dateString = '';
+    (date > 0 && date < 10) ? dateString = `0${date}` : dateString = `${date}`;
+
+    (lastMonth > 0 && lastMonth < 10) ? monthed = `0${lastMonth}` : monthed = `${lastMonth}`;
+
+    if (lastMonth === 13) {
+        fullYear += 1;
+        monthed = '01'
+    } else if (lastMonth === 0) {
+        fullYear -= 1
+        monthed = '12'
+    }
+
+    dateOfMonth.value.push({
+        date: dateString,
+        month: monthed,
+        year: fullYear,
+        fullDate: fullYear + '-' + monthed + '-' + dateString,
+        status: statusActive,
+        checkTaskDoNot: false,
+        checkTaskDone: false,
+        checkTaskLimit: false,
+        countTaskDoNot: 0,
+        countTaskDone: 0,
+        countTaskLimit: 0,
+        task: []
+    })
 }
 
-const checkStatusTask = (item: Task) => {
-  if (item.status === false) {
-    item.status = true;
-  } else {
-    item.status = false;
-  }
-  localStorage.setItem("Task", JSON.stringify(listTasks.value))
-  countTotalDoNotAndDoneTab(listTabs.value);
+const addTaskInDate = () => {
+    let listTask = listTasks.value;
+    listTask = getDataFromLocalStorage();
+
+    dateOfMonth.value.forEach(date => {
+        date.task = filterEndDateEqualFullDate(listTask ? listTask : [], date.fullDate)
+        listTask?.forEach(task => {
+            if (task.endDay === date.fullDate) {
+                if (task.endDay < getDateLocal && !task.status) {
+                    date.checkTaskLimit = true
+                    date.countTaskLimit += 1
+                }
+                if (!task.status) {
+                    date.checkTaskDoNot = true
+                    date.countTaskDoNot += 1
+                }
+                if (task.status) {
+                    date.checkTaskDone = true
+                    date.countTaskDone += 1
+                }
+            }
+        })
+    })
+}
+
+const clickPrevMonth = (check: boolean) => {
+    if (check) {
+        checkMonthYear(currentDate.getMonth() - 1, currentDate.getFullYear());
+    }
+}
+
+const clickNextMonth = (check: boolean) => {
+    if (check) {
+        checkMonthYear(currentDate.getMonth() + 1, currentDate.getFullYear());
+    }
+}
+
+const selectMonth = (month: number, year: number) => {
+    checkMonthYear(month, year);
+}
+
+const checkMonthYear = (month: number, year: number) => {
+    currentDate.setMonth(month);
+    currentDate.setFullYear(year);
+
+    currentMonthed.value = updateMonthed(currentDate);
+
+    updateDays(currentDate);
 }
 
 const showMessageSusscessCreateTask = () => {
-  initDefaultData();
-  countToTalAllTabs(listTabs.value);
-  checkTaskCreateSuccess.value = true;
-  setTimeout(() => {
-    checkTaskCreateSuccess.value = false;
-  }, 1000);
+    initDefaultData();
+    checkTaskCreateSuccess.value = true;
+    setTimeout(() => {
+        checkTaskCreateSuccess.value = false;
+    }, 1000);
 }
+
+const filterEndDateEqualFullDate = (listTasks: Task[], fullDate: string): Task[] => {
+    return listTasks = listTasks.filter(item => {
+        return item.endDay === fullDate
+    })
+}
+
+const eventChangeOpenTask = (data: boolean, fullDate: string | number) => {
+    if (data) {
+        openModalTask();
+        getFullDate.value = fullDate;
+    }
+}
+
+const eventGetDataTaskInDate = (data: Task[]) => {
+    if (data) {
+        listTaskGetDataInDate.value = data
+    }
+}
+
+const eventChangeSelectMonthYear = (month: number, year: number) => {
+    selectMonth(month - 1, year);
+}
+
 </script>
 
 <template>
-  <button @click="openCalendar()">Open Calendar</button>
+    <section class="hidden duration-500" :class="[{ 'message-create-success': checkTaskCreateSuccess }]">
+        <h1>{{ messsSuccessCreateTask }}</h1>
+    </section>
+    <section class="w-[80vh] h-[100vh] m-auto text-center p-8 bg-white rounded-3xl ">
+        <header>
+            <HeaderCalendar @changeSelectMonthYear="eventChangeSelectMonthYear" @changeClickPrevMonth="clickPrevMonth"
+                @changeClickNextMonth="clickNextMonth" :openModalAddTask="openModalAddTask">
+            </HeaderCalendar>
+        </header>
+        <main>
+            <BodyCalendar @changeGetDataTaskInDate="eventGetDataTaskInDate" @changeClickOpenTask="eventChangeOpenTask"
+                :dateOfMonth="dateOfMonth" :getDateLocal="getDateLocal">
+            </BodyCalendar>
+        </main>
+        <footer>
+            <FooterCalendar></FooterCalendar>
+        </footer>
+    </section>
+    <section class="modal absolute hidden w-full h-full backdrop-blur-sm top-0 z-10"
+        :class="[{ 'show-modal-add-task': showModalAddTask }]">
+        <ModalAddTask :listTasks="listTasks" :lostModalAddTask="lostModalAddTask"
+            :showMessageSusscessCreateTask="showMessageSusscessCreateTask" :getDateLocal="getDateLocal">
+        </ModalAddTask>
+    </section>
 
-  <div class="message-create" :class="[{ 'message-create-success': checkTaskCreateSuccess }]">
-    <h1>{{ messsSuccessCreateTask }}</h1>
-  </div>
-  <main class="scrollbar">
-    <section class="header">
-      <h1 class="title">Danh Sách TASK</h1>
-      <div>
-        <div class="date-content">
-          <div>
-            <h2 class="title-content">Task Hôm Nay</h2>
-            <p>Ngày: {{ getDateLocal }}</p>
-          </div>
-          <button @click="openModal()">+ Thêm Task</button>
-        </div>
-        <div class="tab">
-          <Tabs @changeKeyTab="eventChangeKeyTab" @changeListTabs="eventChangeListTabs"></Tabs>
-        </div>
-      </div>
+    <section class="modal absolute hidden w-full h-full backdrop-blur-sm top-0 z-10"
+        :class="[{ 'show-modal-task': showModalTask }]">
+        <ModalTasks :lostModalTask="lostModalTask" :getDateLocal="getDateLocal" :listTasks="listTasks"
+            :getFullDate="getFullDate" :listTaskGetDataInDate="listTaskGetDataInDate">
+        </ModalTasks>
     </section>
-    <section class="item">
-      <TaskList @changeClickTask="eventChangeClickTask" :getDateTimeLocal="dateFormated" :listTasks="listTasksFiltered">
-      </TaskList>
-    </section>
-  </main>
-  <section class="modal" :class="[{ 'show-modal': showModal }]">
-    <ModalAddTask :listTasks="listTasks" :lostModalAddTask="lostModalAddTask"
-      :showMessageSusscessCreateTask="showMessageSusscessCreateTask" :dateFormated="dateFormated"
-      :getDateLocal="getDateLocal">
-    </ModalAddTask>
-  </section>
-  <section class="modal-calendar" :class="[{ 'show-modal-calendar': showModalCalendar }]">
-    <!-- <Calendar></Calendar> -->
-  </section>
 </template>
 
 <style scoped>
-.modal-calendar {
-  position: absolute;
-  display: none;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  top: 0;
-  z-index: 10;
+.modal {
+    background: rgba(0, 0, 0, 0.5);
 }
 
-.show-modal-calendar {
-  display: block;
+.show-modal-add-task {
+    display: block;
 }
 
-.message-create {
-  display: none;
-  transition: 1.5s;
+.show-modal-task {
+    display: block;
 }
 
 .message-create-success {
-  display: block;
-  text-align: center;
-  position: absolute;
-  width: 100%;
-  height: 50px;
-  background-color: rgb(213, 222, 243);
-  opacity: 0.9;
-}
-
-.modal {
-  position: absolute;
-  display: none;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  top: 0;
-  z-index: 10;
-}
-
-.show-modal {
-  display: block;
+    display: block;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    background-color: rgb(213, 222, 243);
+    opacity: 0.9;
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import type { Task } from '../types/TaskInterface';
-import TaskList from "../TaskList.vue";
+import TaskList from "@/components/tasks/TaskList.vue";
 
 export interface Props {
     getFullDate: string | number;
@@ -14,17 +14,12 @@ export interface Props {
 const props = defineProps<Props>()
 
 const checkStatusTask = (item: Task) => {
-    if (item.status === false) {
-        item.status = true;
-    } else {
-        item.status = false;
-    }
+    item.status = !item.status;
 
-    for (const task of props.listTasks) {
-        if (task.id === item.id) {
-            task.status = item.status
-        }
-    }
+    //array method Find (có trả object ko thì undefind) findIndex không có trả về -1 có thì trả về vị trí 
+    const taskFound = props.listTasks.find(task => task.id === item.id)
+
+    if (taskFound) taskFound.status = item.status
 
     localStorage.setItem("Task", JSON.stringify(props.listTasks))
 }

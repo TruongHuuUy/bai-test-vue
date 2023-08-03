@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
-import { type Tab } from "./types/TabInterface";
+import { type Tab } from "@/components/types/TabInterface";
 
 const check = ref(0);
 

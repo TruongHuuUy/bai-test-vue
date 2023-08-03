@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Task } from "./types/TaskInterface";
+import { type Task } from "@/components/types/TaskInterface";
 
 import { reactive, ref } from 'vue';
 

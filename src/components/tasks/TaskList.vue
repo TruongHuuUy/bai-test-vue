@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { type Task } from "./types/TaskInterface";
+import { type Task } from "@/components/types/TaskInterface";
 
 const errorMessageEndDay: string = '* Task đã quá hạn, không thể click hoàn thành Task';
 
 export interface Props {
     getDateTimeLocal: string;
     listTasks?: Task[];
-    // checkStatusTask: (task: Task) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +31,7 @@ const emitEvent = (item: Task) => {
         <div class="card-content">
             <div class="title-content">
                 <h3 class="title-content">Tên Task:
-                    <span :class="[{ 'line-through': item.status === true }]">
+                    <span :class="[{ 'line-through': item.status }]">
                         {{ item.nameTask }}
                     </span>
                 </h3>
@@ -40,13 +39,13 @@ const emitEvent = (item: Task) => {
             </div>
             <input :disabled="item.endDay < props.getDateTimeLocal"
                 :class="[item.endDay < props.getDateTimeLocal ? 'mouse-no-drop' : 'mouse-pointer']" type="checkbox"
-                @click="isChecked(item, index)" :checked="item.status === true">
+                @click="isChecked(item, index)" :checked="item.status">
         </div>
 
         <div class="card-end-day">
             <p>Ngày kết thúc: <span>{{ item.endDay }}</span></p>
-            <p v-if="item.endDay < props.getDateTimeLocal && item.status === false" class="error-message-end-day">{{
-                errorMessageEndDay }}</p>
+            <p v-if="item.endDay < props.getDateTimeLocal && !item.status" class="error-message-end-day">
+                {{ errorMessageEndDay }}</p>
         </div>
     </div>
 </template>
