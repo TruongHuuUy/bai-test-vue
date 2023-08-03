@@ -3,20 +3,9 @@ import { type Task } from "@/components/types/TaskInterface";
 
 import { reactive, ref } from 'vue';
 
-const currentDate = new Date();
 const checkNameTask = ref(false);
 const checkEndDay = ref(false);
 const checkFullName = ref(false);
-const formaHourstUTC = currentDate.getUTCHours() + 7;
-
-const dateFormated =
-    currentDate.getUTCFullYear() + "-" +
-    ("" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" +
-    ("" + currentDate.getUTCDate()).slice(-2) + " " +
-    ("0" + formaHourstUTC).slice(-2) + ":" +
-    ("0" + currentDate.getUTCMinutes()).slice(-2) + ":" +
-    ("0" + currentDate.getUTCSeconds()).slice(-2);
-
 
 export interface Props {
     getDateLocal: string;
@@ -37,6 +26,7 @@ const tasks = reactive<Task>({
     id: 0,
     nameTask: '',
     startDay: '',
+    dateTaskDone: '',
     endDay: '',
     fullName: '',
     status: false
@@ -47,6 +37,15 @@ const listTextError: ListTextError = {
     endDay: ['* Mời bạn chọn Ngày Kết Thúc!', ''],
     fullName: ['* Mời bạn nhập Tên người tạo TASK!', ''],
 };
+
+const dateFormated = (currentDate: Date): string => {
+    return currentDate.getUTCFullYear() + "-" +
+        ("0" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" +
+        ("0" + currentDate.getUTCDate()).slice(-2) + " " +
+        ("0" + (currentDate.getUTCHours() + 7)).slice(-2) + ":" +
+        ("0" + currentDate.getUTCMinutes()).slice(-2) + ":" +
+        ("0" + currentDate.getUTCSeconds()).slice(-2);
+}
 
 const checkBigIdTask = (): number => {
     let count: number = 0;
@@ -64,12 +63,14 @@ const resetItemInputTask = () => {
 }
 
 const addNewTask = () => {
+    const currentDate = new Date();
+
     if (!tasks.nameTask || !tasks.endDay || !tasks.fullName) {
         !tasks.nameTask ? checkNameTask.value = true : checkNameTask.value = false;
         !tasks.endDay ? checkEndDay.value = true : checkEndDay.value = false;
         !tasks.fullName ? checkFullName.value = true : checkFullName.value = false;
     } else {
-        tasks.startDay = dateFormated;
+        tasks.startDay = dateFormated(currentDate);
         tasks.id = checkBigIdTask() + 1;
         props.listTasks.push(tasks);
         localStorage.setItem("Task", JSON.stringify(props.listTasks));
@@ -88,7 +89,9 @@ const addNewTask = () => {
             <h2 class="text-2xl">Thêm Task Mới</h2>
             <span
                 class="absolute top-0 right-3 font-bold cursor-pointer text-xl hover:text-red-500 hover:text-2xl ease-in duration-200"
-                @click="props.lostModalAddTask()">&times;</span>
+                @click="props.lostModalAddTask()">
+                &times;
+            </span>
         </div>
 
         <div class="content text-left flex mb-6 ml-2.5">
@@ -118,7 +121,7 @@ const addNewTask = () => {
         </div>
 
         <div>
-            <button class="btn" @click="addNewTask()">Thêm Mới</button>
+            <button class="btn text-sky-500" @click="addNewTask()">Thêm Mới</button>
         </div>
     </div>
 </template>

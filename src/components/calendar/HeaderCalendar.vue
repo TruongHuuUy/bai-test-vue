@@ -2,9 +2,8 @@
 import { onBeforeMount, ref, watch } from 'vue';
 import IconArrow from '@/components/icons/IconArrow.vue'
 
-import type { Day } from '../types/DayInterface';
-
 const currentDate = new Date();
+const years: number[] = []
 const currentMonth = ref<number>(currentDate.getMonth() + 1);
 const currentYear = ref<number>(currentDate.getFullYear());
 
@@ -19,12 +18,11 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
     changeSelectMonthYear: [month: number, year: number],
-    changeClickPrevMonth: [check: boolean]
-    changeClickNextMonth: [check: boolean],
+    changeClickArrowMonth: [check: boolean]
 }>()
 
 watch([currentMonth, currentYear], ([month, year], [prevMonth, prevYear]) => {
-    emit('changeSelectMonthYear', month, year);
+    emit('changeSelectMonthYear', month - 1, year);
 })
 
 const monthNames: string[] = [
@@ -32,18 +30,15 @@ const monthNames: string[] = [
     '07', '08', '09', '10', '11', '12'
 ];
 
-const years: number[] = []
-
 onBeforeMount(() => {
-    totalYears()
+    totalYears(currentYear.value)
 })
 
-const totalYears = () => {
-    const currentYear = new Date().getFullYear();
-
+const totalYears = (currentYear: number): number[] => {
     for (let i = currentYear - 10; i < currentYear + 10; i++) {
         years.push(i);
     }
+    return years;
 };
 
 const clickNextMonth = () => {
@@ -52,7 +47,7 @@ const clickNextMonth = () => {
         currentYear.value += 1;
         currentMonth.value = 1
     }
-    emit('changeClickNextMonth', true);
+    emit('changeClickArrowMonth', true);
 }
 
 const clickPrevMonth = () => {
@@ -61,7 +56,7 @@ const clickPrevMonth = () => {
         currentYear.value -= 1;
         currentMonth.value = 12
     }
-    emit('changeClickPrevMonth', true);
+    emit('changeClickArrowMonth', false);
 }
 
 </script>
@@ -90,7 +85,7 @@ const clickPrevMonth = () => {
                 <IconArrow />
             </button>
         </div>
-        <button class="btn" @click="props.openModalAddTask()">+ Thêm Task</button>
+        <button class="btn text-sky-500" @click="props.openModalAddTask()">+ Thêm Task</button>
     </div>
 </template>
 

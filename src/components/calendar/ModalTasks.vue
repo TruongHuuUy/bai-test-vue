@@ -13,13 +13,27 @@ export interface Props {
 
 const props = defineProps<Props>()
 
+const dateFormated = (currentDate: Date): string => {
+    return currentDate.getUTCFullYear() + "-" +
+        ("0" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" +
+        ("0" + currentDate.getUTCDate()).slice(-2) + " " +
+        ("0" + (currentDate.getUTCHours() + 7)).slice(-2) + ":" +
+        ("0" + currentDate.getUTCMinutes()).slice(-2) + ":" +
+        ("0" + currentDate.getUTCSeconds()).slice(-2);
+}
+
 const checkStatusTask = (item: Task) => {
+    const currentDate = new Date();
+
     item.status = !item.status;
 
     //array method Find (có trả object ko thì undefind) findIndex không có trả về -1 có thì trả về vị trí 
     const taskFound = props.listTasks.find(task => task.id === item.id)
 
-    if (taskFound) taskFound.status = item.status
+    if (taskFound) {
+        taskFound.status = item.status
+        taskFound.status ? taskFound.dateTaskDone = dateFormated(currentDate) : taskFound.dateTaskDone = '';
+    }
 
     localStorage.setItem("Task", JSON.stringify(props.listTasks))
 }

@@ -16,7 +16,6 @@ const listTasks = ref<Task[]>([]);
 const listTaskGetDataInDate = ref<Task[]>();
 
 const dateOfMonth = ref<Day[]>([])
-const currentMonthed = ref<string | Date>('');
 const getFullDate = ref<string | number>('');
 
 const showModalAddTask = ref<boolean>(false);
@@ -30,7 +29,6 @@ onBeforeMount(() => {
 })
 
 const initDefaultData = () => {
-    currentMonthed.value = updateMonthed(currentDate);
     dateOfMonth.value = updateDays(currentDate);
     listTasks.value = getDataFromLocalStorage();
 }
@@ -60,55 +58,36 @@ const lostModalTask = () => {
     updateDays(currentDate);
 }
 
-const updateMonthed = (currentDate: Date) => {
-    const currentMonthed = (currentDate.toLocaleDateString('en-GB'));
-    return currentMonthed;
-}
-
-const updateDays = (currentDate: Date) => {
+const updateDays = (currentDate: Date): Day[] => {
     const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getMonth();
     const fullYear = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getFullYear();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+    const lastDateOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+    const datesInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
 
     dateOfMonth.value = []
     let monthed = '';
 
-    getLastDateOfLastMonth(lastMonth, fullYear, monthed);
+    for (let i = firstDayOfMonth; i > 0; i--) {
+        addDateToMonth(lastMonth, monthed, fullYear, lastDateOfLastMonth - i + 1, false);
+    }
 
-    getDateInMonth(lastMonth + 1, fullYear, monthed);
+    for (let i = 1; i <= datesInMonth; i++) {
+        addDateToMonth(lastMonth + 1, monthed, fullYear, i, true);
+    }
 
-    getFirstDateOfNextMonth(lastMonth + 2, fullYear, monthed);
+    const countLastDate = 42 - dateOfMonth.value.length;
+
+    for (let i = 1; i <= countLastDate; i++) {
+        addDateToMonth(lastMonth + 2, monthed, fullYear, i, false);
+    }
 
     addTaskInDate();
 
     return dateOfMonth.value
 }
 
-const getLastDateOfLastMonth = (lastMonth: number, fullYear: number, monthed: string) => {
-    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-    const lastDateOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
-
-    for (let i = firstDayOfMonth; i > 0; i--) {
-        addDateToDateOfMonth(lastMonth, monthed, fullYear, lastDateOfLastMonth - i + 1, false);
-    }
-}
-
-const getDateInMonth = (lastMonth: number, fullYear: number, monthed: string) => {
-    const datesInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-
-    for (let i = 1; i <= datesInMonth; i++) {
-        addDateToDateOfMonth(lastMonth, monthed, fullYear, i, true);
-    }
-}
-
-const getFirstDateOfNextMonth = (lastMonth: number, fullYear: number, monthed: string) => {
-    const countLastDate = 42 - dateOfMonth.value.length;
-
-    for (let i = 1; i <= countLastDate; i++) {
-        addDateToDateOfMonth(lastMonth, monthed, fullYear, i, false);
-    }
-}
-
-const addDateToDateOfMonth = (lastMonth: number, monthed: string, fullYear: number, date: number, statusActive: boolean) => {
+const addDateToMonth = (lastMonth: number, monthed: string, fullYear: number, date: number, statusActive: boolean): Day[] => {
     let dateString = '';
     (date > 0 && date < 10) ? dateString = `0${date}` : dateString = `${date}`;
 
@@ -136,6 +115,8 @@ const addDateToDateOfMonth = (lastMonth: number, monthed: string, fullYear: numb
         countTaskLimit: 0,
         task: []
     })
+
+    return dateOfMonth.value
 }
 
 const addTaskInDate = () => {
@@ -163,27 +144,19 @@ const addTaskInDate = () => {
     })
 }
 
-const clickPrevMonth = (check: boolean) => {
-    if (check) {
-        checkMonthYear(currentDate.getMonth() - 1, currentDate.getFullYear());
-    }
+const filterEndDateEqualFullDate = (listTasks: Task[], fullDate: string): Task[] => {
+    return listTasks = listTasks.filter(item => {
+        return item.endDay === fullDate
+    })
 }
 
-const clickNextMonth = (check: boolean) => {
-    if (check) {
-        checkMonthYear(currentDate.getMonth() + 1, currentDate.getFullYear());
-    }
-}
-
-const selectMonth = (month: number, year: number) => {
-    checkMonthYear(month, year);
+const clickBtnArrowMonth = (check: boolean) => {
+    check ? checkMonthYear(currentDate.getMonth() - 1, currentDate.getFullYear()) : checkMonthYear(currentDate.getMonth() + 1, currentDate.getFullYear());
 }
 
 const checkMonthYear = (month: number, year: number) => {
     currentDate.setMonth(month);
     currentDate.setFullYear(year);
-
-    currentMonthed.value = updateMonthed(currentDate);
 
     updateDays(currentDate);
 }
@@ -194,12 +167,6 @@ const showMessageSusscessCreateTask = () => {
     setTimeout(() => {
         checkTaskCreateSuccess.value = false;
     }, 1000);
-}
-
-const filterEndDateEqualFullDate = (listTasks: Task[], fullDate: string): Task[] => {
-    return listTasks = listTasks.filter(item => {
-        return item.endDay === fullDate
-    })
 }
 
 const eventChangeOpenTask = (data: boolean, fullDate: string | number) => {
@@ -216,19 +183,20 @@ const eventGetDataTaskInDate = (data: Task[]) => {
 }
 
 const eventChangeSelectMonthYear = (month: number, year: number) => {
-    selectMonth(month - 1, year);
+    checkMonthYear(month, year);
 }
 
 </script>
 
 <template>
-    <section class="hidden duration-500" :class="[{ 'message-create-success': checkTaskCreateSuccess }]">
-        <h1>{{ messsSuccessCreateTask }}</h1>
+    <section class="hidden absolute w-full text-center mt-1 duration-500 font-bold z-10 bg-sky-200 h-[60px]"
+        :class="[{ 'show-modal': checkTaskCreateSuccess }]">
+        <h1 class="text-xl mt-3.5">{{ messsSuccessCreateTask }}</h1>
     </section>
     <section class="w-[80vh] h-[100vh] m-auto text-center p-8 bg-white rounded-3xl ">
         <header>
-            <HeaderCalendar @changeSelectMonthYear="eventChangeSelectMonthYear" @changeClickPrevMonth="clickPrevMonth"
-                @changeClickNextMonth="clickNextMonth" :openModalAddTask="openModalAddTask">
+            <HeaderCalendar @changeSelectMonthYear="eventChangeSelectMonthYear" @changeClickArrowMonth="clickBtnArrowMonth"
+                :openModalAddTask="openModalAddTask">
             </HeaderCalendar>
         </header>
         <main>
@@ -237,18 +205,18 @@ const eventChangeSelectMonthYear = (month: number, year: number) => {
             </BodyCalendar>
         </main>
         <footer>
-            <FooterCalendar></FooterCalendar>
+            <FooterCalendar />
         </footer>
     </section>
     <section class="modal absolute hidden w-full h-full backdrop-blur-sm top-0 z-10"
-        :class="[{ 'show-modal-add-task': showModalAddTask }]">
+        :class="[{ 'show-modal': showModalAddTask }]">
         <ModalAddTask :listTasks="listTasks" :lostModalAddTask="lostModalAddTask"
             :showMessageSusscessCreateTask="showMessageSusscessCreateTask" :getDateLocal="getDateLocal">
         </ModalAddTask>
     </section>
 
     <section class="modal absolute hidden w-full h-full backdrop-blur-sm top-0 z-10"
-        :class="[{ 'show-modal-task': showModalTask }]">
+        :class="[{ 'show-modal': showModalTask }]">
         <ModalTasks :lostModalTask="lostModalTask" :getDateLocal="getDateLocal" :listTasks="listTasks"
             :getFullDate="getFullDate" :listTaskGetDataInDate="listTaskGetDataInDate">
         </ModalTasks>
@@ -260,21 +228,7 @@ const eventChangeSelectMonthYear = (month: number, year: number) => {
     background: rgba(0, 0, 0, 0.5);
 }
 
-.show-modal-add-task {
+.show-modal {
     display: block;
-}
-
-.show-modal-task {
-    display: block;
-}
-
-.message-create-success {
-    display: block;
-    text-align: center;
-    position: absolute;
-    width: 100%;
-    height: 50px;
-    background-color: rgb(213, 222, 243);
-    opacity: 0.9;
 }
 </style>
