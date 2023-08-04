@@ -7,7 +7,8 @@ import ModalTasks from './components/calendar/ModalTasks.vue'
 
 import { type Task } from "./components/types/TaskInterface";
 import { type Day } from "./components/types/DayInterface";
-import { onBeforeMount, ref } from 'vue';
+import { type CheckedTask } from './components/types/CheckedTaskInterface';
+import { onBeforeMount, ref, reactive } from 'vue';
 
 const currentDate = new Date();
 const getDateLocal: string = new Date().toLocaleDateString("en-CA");
@@ -21,6 +22,12 @@ const getFullDate = ref<string | number>('');
 const showModalAddTask = ref<boolean>(false);
 const showModalTask = ref<boolean>(false);
 const checkTaskCreateSuccess = ref<boolean>(false);
+
+const isCheckedSortTask = reactive<CheckedTask>({
+    isCheckSortTaskLimit: true,
+    isCheckSortTaskDoNot: true,
+    isCheckSortTaskDone: true,
+})
 
 const messsSuccessCreateTask: string = 'Bạn đã tạo TASK thành công';
 
@@ -196,12 +203,12 @@ const eventChangeSelectMonthYear = (month: number, year: number) => {
     <section class="w-[80vh] h-[100vh] m-auto text-center p-8 bg-white rounded-3xl ">
         <header>
             <HeaderCalendar @changeSelectMonthYear="eventChangeSelectMonthYear" @changeClickArrowMonth="clickBtnArrowMonth"
-                :openModalAddTask="openModalAddTask">
+                :openModalAddTask="openModalAddTask" :isCheckedSortTask="isCheckedSortTask">
             </HeaderCalendar>
         </header>
         <main>
             <BodyCalendar @changeGetDataTaskInDate="eventGetDataTaskInDate" @changeClickOpenTask="eventChangeOpenTask"
-                :dateOfMonth="dateOfMonth" :getDateLocal="getDateLocal">
+                :dateOfMonth="dateOfMonth" :getDateLocal="getDateLocal" :isCheckedSortTask="isCheckedSortTask">
             </BodyCalendar>
         </main>
         <footer>

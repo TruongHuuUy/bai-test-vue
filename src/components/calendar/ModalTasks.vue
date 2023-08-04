@@ -29,11 +29,6 @@ const checkStatusTask = (item: Task) => {
 
     localStorage.setItem("Task", JSON.stringify(props.listTasks))
 }
-
-const eventChangeClickTask = (item: Task) => {
-    checkStatusTask(item);
-}
-
 </script>
 
 <template>
@@ -50,7 +45,7 @@ const eventChangeClickTask = (item: Task) => {
         </div>
 
         <section class="item-scroll max-h-[70vh] overflow-y-scroll">
-            <TaskList @changeClickTask="eventChangeClickTask" :getDateTimeLocal="getDateLocal"
+            <TaskList @changeClickTask="checkStatusTask" :getDateTimeLocal="getDateLocal"
                 :listTasks="listTaskGetDataInDate">
             </TaskList>
         </section>

@@ -12,9 +12,8 @@ const props = withDefaults(defineProps<Props>(), {
     getDateTimeLocal: '',
 })
 
-const isChecked = (item: Task, index: number): boolean => {
+const isChecked = (item: Task, index: number) => {
     emitEvent(item)
-    return item.status
 }
 
 const emit = defineEmits<{

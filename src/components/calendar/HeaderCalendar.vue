@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { type CheckedTask } from '@/components/types/CheckedTaskInterface';
 import { onBeforeMount, ref, watch } from 'vue';
 import IconArrow from '@/components/icons/IconArrow.vue'
+import IconReloadSort from '../icons/IconReloadSort.vue';
 
 const currentDate = new Date();
 const years: number[] = []
@@ -8,15 +10,16 @@ const currentMonthed = ref<number>(currentDate.getMonth() + 1);
 const currentYeared = ref<number>(currentDate.getFullYear());
 const currentMonth = currentMonthed.value;
 const currentYear = currentYeared.value;
+const props = defineProps<Props>()
+const isCheckTask: CheckedTask = props.isCheckedSortTask;
 
 const styleSelect = 'text-center min-w-[80px] h-8 rounded-xl outline-none border-solid border-[1px] border-sky-300 duration-700';
 const styleButton = 'text-sky-500 hover:text-red-600 duration-500'
 
 export interface Props {
+    isCheckedSortTask: CheckedTask;
     openModalAddTask: () => void;
 }
-
-const props = defineProps<Props>()
 
 const emit = defineEmits<{
     changeSelectMonthYear: [month: number, year: number],
@@ -27,6 +30,30 @@ const monthNames: string[] = [
     '01', '02', '03', '04', '05', '06',
     '07', '08', '09', '10', '11', '12'
 ];
+
+interface SortTask {
+    id: number,
+    key: string,
+    class: string,
+}
+
+const btnSortsTask = ref<SortTask[]>([
+    {
+        id: 1,
+        key: 'sortLimit',
+        class: 'w-6 h-6 rounded-full ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400 mt-1 bg-red-400 mr-2',
+    },
+    {
+        id: 2,
+        key: 'sortDoNot',
+        class: 'w-6 h-6 rounded-full ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400 mt-1 bg-sky-400 mr-2',
+    },
+    {
+        id: 3,
+        key: 'sortDone',
+        class: 'w-6 h-6 rounded-full ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400 mt-1 bg-lime-500 mr-2',
+    },
+])
 
 onBeforeMount(() => {
     totalYears(currentYeared.value)
@@ -67,6 +94,26 @@ const clickPrevMonth = () => {
     emit('changeClickArrowMonth', false);
 }
 
+const clickSortDefault = () => {
+    isCheckTask.isCheckSortTaskLimit = true
+    isCheckTask.isCheckSortTaskDone = true
+    isCheckTask.isCheckSortTaskDoNot = true
+}
+
+const clickButtonSort = (key: string) => {
+    isCheckTask.isCheckSortTaskLimit = false
+    isCheckTask.isCheckSortTaskDone = false
+    isCheckTask.isCheckSortTaskDoNot = false
+
+    if (key === 'sortLimit') {
+        isCheckTask.isCheckSortTaskLimit = true
+    } else if (key === 'sortDoNot') {
+        isCheckTask.isCheckSortTaskDoNot = true
+    } else {
+        isCheckTask.isCheckSortTaskDone = true
+    }
+}
+
 </script>
 
 <template>
@@ -91,6 +138,10 @@ const clickPrevMonth = () => {
             <button :class="styleButton" class="rotate-180 ml-2" @click="clickNextMonth()">
                 <IconArrow />
             </button>
+        </div>
+        <div class="mt-2 flex cursor-pointer">
+            <IconReloadSort class="mr-2" @click="clickSortDefault()"></IconReloadSort>
+            <button v-for="btnSort in btnSortsTask" :class="[btnSort.class]" @click="clickButtonSort(btnSort.key)"></button>
         </div>
         <button class="btn text-sky-500" @click="props.openModalAddTask()">+ Thêm Task</button>
     </div>

@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { type CheckedTask } from '@/components/types/CheckedTaskInterface';
 import { type Day } from '@/components/types/DayInterface';
 import type { Task } from '../types/TaskInterface';
 
 const styleBtnTasks = 'hidden w-7 h-7 rounded-full cursor-pointer ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400'
 
 export interface Props {
+    isCheckedSortTask: CheckedTask;
     getDateLocal: string;
     dateOfMonth: Day[];
 }
@@ -15,6 +17,8 @@ const emit = defineEmits<{
 }>()
 
 const props = defineProps<Props>()
+
+console.log(props.isCheckedSortTask);
 
 const days: string[] = [
     'CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'
@@ -67,15 +71,15 @@ const onclickTaskDone = (task: Task[], fullDate: string | number) => {
                 :class="{ 'active absolute w-full h-full top-0 pt-5 border-[2px] border-orange-400 z-0': item.fullDate === props.getDateLocal }">
                 <div class="flex justify-around items-center h-[70px] text-white font-bold">
                     <button @click="onclickTaskLimit(item.task, item.fullDate)"
-                        :class="[{ 'show-task-in-date bg-red-400': item.checkTaskLimit && item.checkTaskDoNot && item.status }, styleBtnTasks]">
+                        :class="[{ 'show-task-in-date bg-red-400': item.checkTaskLimit && item.checkTaskDoNot && item.status && props.isCheckedSortTask.isCheckSortTaskLimit }, styleBtnTasks]">
                         <span>{{ item.countTaskLimit }}</span>
                     </button>
                     <button @click="onclickTaskDoNot(item.task, item.fullDate)"
-                        :class="[{ 'show-task-in-date bg-sky-400': item.checkTaskDoNot && !item.checkTaskLimit && item.status }, styleBtnTasks]">
+                        :class="[{ 'show-task-in-date bg-sky-400': item.checkTaskDoNot && !item.checkTaskLimit && item.status && props.isCheckedSortTask.isCheckSortTaskDoNot }, styleBtnTasks]">
                         <span>{{ item.countTaskDoNot }}</span>
                     </button>
                     <button @click="onclickTaskDone(item.task, item.fullDate)"
-                        :class="[{ 'show-task-in-date bg-lime-500': item.checkTaskDone && item.status }, styleBtnTasks]">
+                        :class="[{ 'show-task-in-date bg-lime-500': item.checkTaskDone && item.status && props.isCheckedSortTask.isCheckSortTaskDone }, styleBtnTasks]">
                         <span>{{ item.countTaskDone }}</span>
                     </button>
                 </div>

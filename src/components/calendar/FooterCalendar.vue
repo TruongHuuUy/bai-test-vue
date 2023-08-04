@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const styleBtnTasks = 'w-6 h-6 rounded-full cursor-pointer ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400'
+const styleBtnTasks = 'w-6 h-6 rounded-full cursor-pointer ease-in text-base duration-300 hover:rounded-xl hover:bg-emerald-400 mr-2'
 
 </script>
 
@@ -9,17 +9,17 @@ const styleBtnTasks = 'w-6 h-6 rounded-full cursor-pointer ease-in text-base dur
         <div class="ml-5">
             <div class="flex items-center mb-2">
                 <p class="mr-2">-</p>
-                <button :class="[styleBtnTasks, 'bg-red-400 mr-2']"></button>
+                <button :class="[styleBtnTasks, 'bg-red-400']"></button>
                 <p>: Task đã quá hạn</p>
             </div>
             <div class="flex items-center mb-2">
                 <p class="mr-2">-</p>
-                <button :class="[styleBtnTasks, 'bg-sky-400 mr-2']"></button>
+                <button :class="[styleBtnTasks, 'bg-sky-400']"></button>
                 <p>: Task chưa hoàn thành</p>
             </div>
             <div class="flex items-center">
                 <p class="mr-2">-</p>
-                <button :class="[styleBtnTasks, 'bg-lime-500 mr-2']"></button>
+                <button :class="[styleBtnTasks, 'bg-lime-500']"></button>
                 <p>: Task đã hoàn thành</p>
             </div>
         </div>
