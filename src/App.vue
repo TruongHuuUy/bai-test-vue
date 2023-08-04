@@ -193,6 +193,28 @@ const eventChangeSelectMonthYear = (month: number, year: number) => {
     checkMonthYear(month, year);
 }
 
+const clickSortTask = (ckeckedTask: boolean, nameSort: string) => {
+    console.log(ckeckedTask, nameSort);
+    if (nameSort === 'sortLimit') {
+        isCheckedSortTask.isCheckSortTaskLimit = true
+    } else if (nameSort === 'sortDoNot') {
+        isCheckedSortTask.isCheckSortTaskDoNot = true
+    } else {
+        isCheckedSortTask.isCheckSortTaskDone = true
+    }
+}
+
+const clickSortReloadTask = (checkedReloadTask: boolean) => {
+    if (checkedReloadTask) {
+        isCheckedSortTask.isCheckSortTaskLimit = true
+        isCheckedSortTask.isCheckSortTaskDoNot = true
+        isCheckedSortTask.isCheckSortTaskDone = true
+    } else {
+        isCheckedSortTask.isCheckSortTaskLimit = false
+        isCheckedSortTask.isCheckSortTaskDoNot = false
+        isCheckedSortTask.isCheckSortTaskDone = false
+    }
+}
 </script>
 
 <template>
@@ -203,6 +225,7 @@ const eventChangeSelectMonthYear = (month: number, year: number) => {
     <section class="w-[80vh] h-[100vh] m-auto text-center p-8 bg-white rounded-3xl ">
         <header>
             <HeaderCalendar @changeSelectMonthYear="eventChangeSelectMonthYear" @changeClickArrowMonth="clickBtnArrowMonth"
+                @isCheckSortTask="clickSortTask" @isCheckReloadSortTask="clickSortReloadTask"
                 :openModalAddTask="openModalAddTask" :isCheckedSortTask="isCheckedSortTask">
             </HeaderCalendar>
         </header>

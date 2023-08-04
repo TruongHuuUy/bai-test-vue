@@ -11,7 +11,6 @@ const currentYeared = ref<number>(currentDate.getFullYear());
 const currentMonth = currentMonthed.value;
 const currentYear = currentYeared.value;
 const props = defineProps<Props>()
-const isCheckTask: CheckedTask = props.isCheckedSortTask;
 
 const styleSelect = 'text-center min-w-[80px] h-8 rounded-xl outline-none border-solid border-[1px] border-sky-300 duration-700';
 const styleButton = 'text-sky-500 hover:text-red-600 duration-500'
@@ -24,6 +23,8 @@ export interface Props {
 const emit = defineEmits<{
     changeSelectMonthYear: [month: number, year: number],
     changeClickArrowMonth: [check: boolean],
+    isCheckSortTask: [check: boolean, name: string]
+    isCheckReloadSortTask: [check: boolean]
 }>()
 
 const monthNames: string[] = [
@@ -95,23 +96,12 @@ const clickPrevMonth = () => {
 }
 
 const clickSortDefault = () => {
-    isCheckTask.isCheckSortTaskLimit = true
-    isCheckTask.isCheckSortTaskDone = true
-    isCheckTask.isCheckSortTaskDoNot = true
+    emit('isCheckReloadSortTask', true)
 }
 
 const clickButtonSort = (key: string) => {
-    isCheckTask.isCheckSortTaskLimit = false
-    isCheckTask.isCheckSortTaskDone = false
-    isCheckTask.isCheckSortTaskDoNot = false
-
-    if (key === 'sortLimit') {
-        isCheckTask.isCheckSortTaskLimit = true
-    } else if (key === 'sortDoNot') {
-        isCheckTask.isCheckSortTaskDoNot = true
-    } else {
-        isCheckTask.isCheckSortTaskDone = true
-    }
+    emit('isCheckReloadSortTask', false)
+    emit('isCheckSortTask', true, key)
 }
 
 </script>

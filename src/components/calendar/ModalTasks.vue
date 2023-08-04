@@ -24,7 +24,7 @@ const checkStatusTask = (item: Task) => {
 
     if (taskFound) {
         taskFound.status = item.status
-        taskFound.status ? taskFound.dateTaskDone = dateFormated(currentDate) : taskFound.dateTaskDone = '';
+        taskFound.dateTaskDone = taskFound.status ? dateFormated(currentDate) : taskFound.dateTaskDone = ''
     }
 
     localStorage.setItem("Task", JSON.stringify(props.listTasks))
