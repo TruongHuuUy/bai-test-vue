@@ -4,16 +4,16 @@ import IconArrow from '@/components/icons/IconArrow.vue'
 
 const currentDate = new Date();
 const years: number[] = []
-const currentMonth = ref<number>(currentDate.getMonth() + 1);
-const currentYear = ref<number>(currentDate.getFullYear());
-const getToDay = ("0" + currentDate.getUTCDate()).slice(-2) + "-" + ("0" + (currentDate.getUTCMonth() + 1)).slice(-2) + "-" + currentDate.getUTCFullYear()
+const currentMonthed = ref<number>(currentDate.getMonth() + 1);
+const currentYeared = ref<number>(currentDate.getFullYear());
+const currentMonth = currentMonthed.value;
+const currentYear = currentYeared.value;
 
 const styleSelect = 'text-center min-w-[80px] h-8 rounded-xl outline-none border-solid border-[1px] border-sky-300 duration-700';
 const styleButton = 'text-sky-500 hover:text-red-600 duration-500'
 
 export interface Props {
     openModalAddTask: () => void;
-    // initDefaultData: () => void;
 }
 
 const props = defineProps<Props>()
@@ -23,46 +23,46 @@ const emit = defineEmits<{
     changeClickArrowMonth: [check: boolean],
 }>()
 
-watch([currentMonth, currentYear], ([month, year], [prevMonth, prevYear]) => {
-    emit('changeSelectMonthYear', month - 1, year);
-})
-
 const monthNames: string[] = [
     '01', '02', '03', '04', '05', '06',
     '07', '08', '09', '10', '11', '12'
 ];
 
 onBeforeMount(() => {
-    totalYears(currentYear.value)
+    totalYears(currentYeared.value)
 })
 
-const totalYears = (currentYear: number): number[] => {
-    for (let i = currentYear - 10; i < currentYear + 10; i++) {
+watch([currentMonthed, currentYeared], ([month, year], [prevMonth, prevYear]) => {
+    emit('changeSelectMonthYear', month - 1, year);
+})
+
+const totalYears = (currentYeared: number): number[] => {
+    for (let i = currentYeared - 10; i < currentYeared + 10; i++) {
         years.push(i);
     }
     return years;
 };
 
-// const loadDataDefault = () => {
-//     console.log(currentMonth.value);
-
-//     props.initDefaultData()
-// }
+const loadDataDefault = (month: number, year: number) => {
+    emit('changeSelectMonthYear', month - 1, year);
+    currentMonthed.value = currentMonth
+    currentYeared.value = currentYear
+}
 
 const clickNextMonth = () => {
-    currentMonth.value += 1;
-    if (currentMonth.value > 12) {
-        currentYear.value += 1;
-        currentMonth.value = 1
+    currentMonthed.value += 1;
+    if (currentMonthed.value > 12) {
+        currentYeared.value += 1;
+        currentMonthed.value = 1
     }
     emit('changeClickArrowMonth', true);
 }
 
 const clickPrevMonth = () => {
-    currentMonth.value -= 1;
-    if (currentMonth.value === 0) {
-        currentYear.value -= 1;
-        currentMonth.value = 12
+    currentMonthed.value -= 1;
+    if (currentMonthed.value === 0) {
+        currentYeared.value -= 1;
+        currentMonthed.value = 12
     }
     emit('changeClickArrowMonth', false);
 }
@@ -71,20 +71,19 @@ const clickPrevMonth = () => {
 
 <template>
     <div class="relative font-bold border-b-2 border-slate-400 pb-3 mb-6">
-        <h2 class="text-3xl">CALENDAR</h2>
+        <button class="text-3xl" @click="loadDataDefault(currentMonth, currentYear)">CALENDAR</button>
     </div>
-    <!-- <button class="text-xl font-bold text-red-500" @click="loadDataDefault()">{{ getToDay }}</button> -->
     <div class="flex justify-between mb-3">
         <div class="flex items-center">
             <button :class="styleButton" class="mr-2" @click="clickPrevMonth()">
                 <IconArrow />
             </button>
-            <select v-model="currentMonth" :class="styleSelect" class="mr-2">
+            <select v-model="currentMonthed" :class="styleSelect" class="mr-2">
                 <option v-for="(month, index) in monthNames" :value="index + 1">
                     {{ month }}
                 </option>
             </select>
-            <select v-model="currentYear" :class="styleSelect">
+            <select v-model="currentYeared" :class="styleSelect">
                 <option v-for="year in years" :key="year" :value="year">
                     {{ year }}
                 </option>
